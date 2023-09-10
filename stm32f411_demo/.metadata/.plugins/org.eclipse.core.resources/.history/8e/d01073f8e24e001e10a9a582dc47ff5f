@@ -1,0 +1,107 @@
+/*
+ * stm32f411disc_uart_driver.c
+ *
+ *  Created on: Sep 9, 2023
+ *      Author: Dell
+ */
+
+#include "stm32f411_uart_driver.h"
+
+void USART_PeriClockControl(USART_RegDef_t *pUSARTx, uint8_t EnorDi)
+{
+    if (EnorDi == ENABLE)
+    {
+        if (pUSARTx == USART1)
+            USART1_PCLK_EN();
+        else if (pUSARTx == USART2)
+            USART2_PCLK_EN();
+        else if (pUSARTx == USART6)
+            USART6_PCLK_EN();
+    }
+    else
+    {
+        if (pUSARTx == USART1)
+            USART1_PCLK_DI();
+        else if (pUSARTx == USART2)
+            USART2_PCLK_DI();
+        else if (pUSARTx == USART6)
+            USART6_PCLK_DI();
+    }
+}
+
+void USART_Init(USART_Handle_t *pUSARTHandle)
+{
+    uint32_t temp = 0;
+
+    // USART TX AND RX ENGINES ACC TO USART MODE CONFIGURATIONS
+    if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_ONLY_RX)
+    {
+        temp |= (1 << USART_CR1_RE);
+    }
+    else if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_ONLY_TX)
+    {
+        temp |= (1 << USART_CR1_TE);
+    }
+    else if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_TXRX)
+    {
+        // Implement the code to enable the both Transmitter and Receiver bit fields
+        temp |= ((1 << USART_CR1_RE) | (1 << USART_CR1_TE));
+    }
+
+    temp |= pUSARTHandle->USART_Config.USART_WordLength << USART_CR1_M;
+
+    // configuring parity bits
+
+    if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_EVEN)
+    {
+        // enable parity control
+        temp |= (1 << USART_CR1_PCE);
+    }
+    else if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_ODD)
+    {
+        // Implement the code to enable the parity control
+        temp |= (1 << USART_CR1_PCE);
+
+        // Implement the code to enable ODD parity
+        temp |= (1 << USART_CR1_PS);
+    }
+
+    // configuring the CR1 REgister
+    pUSARTHandle->pUSARTx->CR1 = temp;
+
+    // cr2 configuration
+    temp = 0;
+    if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOPBITS_0_5)
+    {
+        temp |= (1 << USART_CR2_STOP);
+    }
+    else if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOPBITS_2)
+    {
+        temp |= (2 << USART_CR2_STOP);
+    }
+    else if (pUSARTHandle->USART_Config.USART_NoOfStopBits == USART_STOPBITS_1_5)
+    {
+        temp |= (3 << USART_CR2_STOP);
+    }
+    // program the CR2 Register
+    pUSARTHandle->pUSARTx->CR2 = temp;
+    // configuring CR3 Register
+
+    temp = 0;
+    if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS)
+    {
+        temp |= (1 << USART_CR3_CTSE);
+    }
+    else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_RTS)
+    {
+        temp |= (1 << USART_CR3_RTSE);
+    }
+    else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS_RTS)
+    {
+        temp |= (1 << USART_CR3_CTSE);
+        temp |= (1 << USART_CR3_RTSE);
+    }
+    pUSARTHandle->pUSARTx->CR3 = temp;
+
+    USART_SetBaudRate(pUSARTHandle->pUSARTx, pUSARTHandle->USART_Config.USART_Baud);
+}

@@ -1,0 +1,53 @@
+/*
+ * stm32f411_gpio_driver.h
+ *
+ *  Created on: Sep 2, 2023
+ *      Author: Dell
+ */
+
+#ifndef INC_STM32F411_GPIO_DRIVER_H_
+#define INC_STM32F411_GPIO_DRIVER_H_
+
+#include "stm32f411.h"
+
+typedef struct
+{
+	uint8_t GPIO_PinNumber;
+	uint8_t GPIO_PinMode;
+	uint8_t GPIO_PinSpeed;
+	uint8_t GPIO_PinPuPdControl;
+	uint8_t GPIO_PinOPType;
+	uint8_t GPIO_PinAltFunMode;
+
+}GPIO_Pinconfig_t;
+
+typedef struct
+{
+	//pointer to hold the base address of the GPIO port to which the pin belong peripheral
+	GPIO_RegDef_t *pGPIOx;
+	GPIO_PinConfig_t GPIO_Pinconfig;
+}GPIO_Handle_t;
+
+//Peripheral clock setup
+
+void GPIO_PeriClockControl(GPIO_RegDef_t *pGPIOx, uint8_t EnorDi);
+
+//Init and De_init
+
+void GPIO_Init(void);
+void GPIO_DeInit(void);
+
+//Data read and write
+
+void GPIO_ReadFromInputPin(void);
+void GPIO_ReadFromInputPort(void);
+void GPIO_WriteToOutputPin(void);
+void GPIO_WriteToOutputPort(void);
+void GPIO_ToggleOutputPin(void);	//reserved
+
+//IRQ Configuration and ISR handling
+
+void GPIO_IRQConfig(void);
+void GPIO_IRQHandling(void);
+
+#endif /* INC_STM32F411_GPIO_DRIVER_H_ */

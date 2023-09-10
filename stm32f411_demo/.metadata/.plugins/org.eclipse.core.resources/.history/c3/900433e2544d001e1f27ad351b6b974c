@@ -1,0 +1,83 @@
+/*
+ * stm32f411disc_spi_driver.c
+ *
+ *  Created on: Sep 7, 2023
+ *      Author: Dell
+ */
+
+#include "stm32f411_spi_driver.h"
+
+// SPI peripheral clock control
+
+void SPI_PeripheralClockControl(SPI_RegDef_t *pSPIx , uint8_t EnorDi) {
+
+	if (EnorDi == ENABLE)
+	{
+		if (pSPIx == SPI1)
+			SPI1_PCLK_EN();
+		else if (pSPIx == SPI2)
+			SPI2_PCLK_EN();
+		else if (pSPIx == SPI3)
+			SPI3_PCLK_EN();
+	}
+	else
+	{
+		if (pSPIx == SPI1)
+			SPI1_PCLK_DI();
+		else if (pSPIx == SPI2)
+			SPI2_PCLK_DI();
+		else if (pSPIx == SPI3)
+			SPI3_PCLK_DI();
+	}
+}
+
+
+// enable the clock
+SPI_PeripheralClockControl(pSPIHandle->pSPIx, ENABLE);
+// first configure the spi_cr1 register
+
+uint32_t tempreg = 0 ;
+
+	// configure the the spi device mode
+	tempreg |=  ( pSPIHandle->SPIConfig.SPI_DeviceMode << SPI_CR1_MSTR) ;
+
+// configure the bus config
+if (pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_FD) {
+
+	// BIDIMODE should be cleared
+	tempreg &= ~( 1 << SPI_CR1_BIDIMODE) ;
+
+}else if (pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_HD) {
+
+	// BIDIMODE should be set
+	tempreg |=  ( 1 << SPI_CR1_BIDIMODE) ;
+
+}else if (pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_RXONLY) {
+
+	// BIDIMODE should be cleared ;
+	tempreg &= ~( 1 << SPI_CR1_BIDIMODE) ;
+
+	// RXOONLY bit should be set
+	tempreg |=  ( 1 << SPI_CR1_RXONLY) ;
+
+}
+
+// configure spi clock speed
+tempreg |= (pSPIHandle->SPIConfig.SPI_SclkSpeed << SPI_CR1_BR) ;
+
+// configure spi dff mode
+tempreg |= (pSPIHandle->SPIConfig.SPI_DFF << SPI_CR1_DFF) ;
+
+// configure spi cpol
+tempreg |= (pSPIHandle->SPIConfig.SPI_CPOL << SPI_CR1_CPOL) ;
+
+// configure spi cpha
+tempreg |= (pSPIHandle->SPIConfig.SPI_CPOL << SPI_CR1_CPHA) ;
+
+// configure spi ssm
+tempreg |= (pSPIHandle->SPIConfig.SPI_SSM << SPI_CR1_SSM) ;
+
+pSPIHandle->pSPIx->CR1 = tempreg ;
+
+}
+

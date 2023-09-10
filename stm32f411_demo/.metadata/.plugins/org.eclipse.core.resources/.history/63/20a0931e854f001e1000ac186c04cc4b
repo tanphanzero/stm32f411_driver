@@ -1,0 +1,120 @@
+/*
+ * stm32f411disc_i2c_driver.c
+ *
+ *  Created on: Sep 10, 2023
+ *      Author: Dell
+ */
+
+
+#include "stm32f411_i2c_driver.h"
+#include <stddef.h>
+
+void I2C_PeripheralControl(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi)
+{
+	if (EnOrDi == ENABLE)
+	{
+		pI2Cx->CR1 |= (1 << I2C_CR1_PE);
+	}
+	else
+	{
+		pI2Cx->CR1 &= ~(1 << 0);
+	}
+}
+
+void I2C_PeripheralClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi)
+{
+    if (EnOrDi == ENABLE)
+    {
+        if (pI2Cx == I2C1)
+            I2C1_PCLK_EN();
+        else if (pI2Cx == I2C2)
+            I2C2_PCLK_EN();
+        else if (pI2Cx == I2C3)
+            I2C3_PCLK_EN();
+    }
+    else
+    {
+        if (pI2Cx == I2C1)
+            I2C1_PCLK_DI();
+        else if (pI2Cx == I2C2)
+            I2C2_PCLK_DI();
+        else if (pI2Cx == I2C3)
+            I2C3_PCLK_DI();
+    }
+}
+
+void I2C_Init(I2C_Handle_t *pI2CHandle)
+{
+    // enable clock
+    I2C_PeripheralClockControl(pI2CHandle->pI2Cx, ENABLE);
+
+    // calculate P1CLK for FREQ
+    uint32_t P1CLK = RCC_Get_PCLK1Freq();
+    pI2CHandle->pI2Cx->CR2 &= ~(63 << I2C_CR2_FREQ);
+    pI2CHandle->pI2Cx->CR2 |= (((P1CLK / 1000000) << I2C_CR2_FREQ) & (0x3F));
+
+    // address
+    pI2CHandle->pI2Cx->OAR1 &= ~(0x7f << 1);
+    pI2CHandle->pI2Cx->OAR1 |= (pI2CHandle->I2C_Config.I2C_DeviceAddress << 1);
+    pI2CHandle->pI2Cx->OAR1 &= ~(0x1 << 15);
+    pI2CHandle->pI2Cx->OAR1 |= (0x1 << 14);
+
+    // CCR Calculation
+    uint16_t ccr = 0;
+
+    pI2CHandle->pI2Cx->CCR &= ~(0xfff << 0);
+
+    if (pI2CHandle->I2C_Config.I2C_SCLSpeed <= I2C_SCL_SPEED_SM)
+    {
+        // SM
+        pI2CHandle->pI2Cx->CCR &= ~(0x1 << 15);
+        // Thigh = CCR * Tpclk1
+        // Tlow = CCR * Tpclk1
+        // Thigh + Tlow = Tscl = 2 * CCR * Tpclk1
+        // => CCR = Tscl / (2 * Tpclk1)
+        // => CCR = fclk1 / (2 * fscl)
+        // fscl = frequency requested by user for serial clock
+        // fclk1 is the frequency at the APB bus
+        ccr = RCC_Get_PCLK1Freq() / (2 * pI2CHandle->I2C_Config.I2C_SCLSpeed);
+    }
+    else
+    {
+        // FM
+        pI2CHandle->pI2Cx->CCR |= (0x1 << 15);
+        // DutyCycle
+        pI2CHandle->pI2Cx->CCR &= ~(0x1 << I2C_CCR_DUTY);
+        pI2CHandle->pI2Cx->CCR |= (pI2CHandle->I2C_Config.FMDutyCycle << I2C_CCR_DUTY);
+        if (pI2CHandle->I2C_Config.FMDutyCycle == I2C_FM_DUTY_2)
+        {
+            // Thigh = CCR * Tpclk1
+            // Tlow = 2 * CCr * Tpclk1
+            // Thigh + Tlow = Tsclk = 3 * CCR * Tpclk1
+            // CCR = Tsclk / (3 * Tpclk1)
+            // CCR = fpclk1 / (3 * fsclk)
+            ccr = RCC_Get_PCLK1Freq() / (3 * pI2CHandle->I2C_Config.I2C_SCLSpeed);
+        }
+        else
+        {
+            // Thigh = 9 * CCR * Tpclk1
+            // Tlow = 16 * CCR * Tpclk1
+            // Thigh + Tlow = 25 * CCR * Tpclk1 = Tsclk
+            // 25 * CCR / fpclk1 = 1/fsclk
+            // CCR = fpclk1 / (25 * fsclk)
+            ccr = RCC_Get_PCLK1Freq() / (25 * pI2CHandle->I2C_Config.I2C_SCLSpeed);
+        }
+    }
+    pI2CHandle->pI2Cx->CCR |= ((ccr << 0) & (0xfff));
+    uint8_t tRise;
+    if (pI2CHandle->I2C_Config.I2C_SCLSpeed == I2C_SCL_SPEED_SM)
+    {
+        // tRise = Tmax/Tpclk1 + 1 = Tmax * Fpclk1 + 1; Tmax = 1000*10^-9 = 1/1000000
+        tRise = (RCC_Get_PCLK1Freq() / 1000000U) + 1;
+    }
+    else
+    {
+        tRise = (RCC_Get_PCLK1Freq() * 3 / 10000000U) + 1;
+    }
+
+    pI2CHandle->pI2Cx->TRISE &= ~(0x3f << 0);
+    pI2CHandle->pI2Cx->TRISE |= ((tRise << 0) & (0x3f));
+}

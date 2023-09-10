@@ -1,0 +1,32 @@
+/*
+ * stm32f411disc_spi_driver.c
+ *
+ *  Created on: Sep 7, 2023
+ *      Author: Dell
+ */
+
+#include "stm32f411_spi_driver.h"
+
+// spi peripheral clock control
+
+void SPI_PeripheralClockControl(SPI_RegDef_t *pSPIx , uint8_t EnorDi) {
+
+	if (EnorDi == ENABLE)
+	{
+		if (pSPIx == SPI1)
+			SPI1_CLOCK_ENABLE();
+		else if (pSPIx == SPI2)
+			SPI2_CLOCK_ENABLE();
+		else if (pSPIx == SPI3)
+			SPI3_CLOCK_ENABLE();
+	}
+	else
+	{
+		if (pSPIx == SPI1)
+			SPI1_CLOCK_DISABLE();
+		else if (pSPIx == SPI2)
+			SPI2_CLOCK_DISABLE();
+		else if (pSPIx == SPI3)
+			SPI3_CLOCK_DISABLE();
+	}
+}

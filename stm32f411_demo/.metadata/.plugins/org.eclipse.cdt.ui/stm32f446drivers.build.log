@@ -1,0 +1,20 @@
+10:53:50 **** Incremental Build of configuration Debug for project stm32f446drivers ****
+make -j8 all 
+arm-none-eabi-gcc "../src/SPITX.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32 -DSTM32F4 -DSTM32F446RETx -DNUCLEO_F446RE -DDEBUG -c -I"C:/Users/Dell/Downloads/reg/Embedded-Device-Drivers-for-STM32-Nucleo-board/drivers/inc" -O0 -ffunction-sections -Wall -fstack-usage -MMD -MP -MF"src/SPITX.d" -MT"src/SPITX.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "src/SPITX.o"
+arm-none-eabi-gcc -o "stm32f446drivers.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Dell\Downloads\reg\Embedded-Device-Drivers-for-STM32-Nucleo-board\LinkerScript.ld" --specs=nosys.specs -Wl,-Map="stm32f446drivers.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: stm32f446drivers.elf
+ 
+arm-none-eabi-size   stm32f446drivers.elf 
+arm-none-eabi-objdump -h -S  stm32f446drivers.elf  > "stm32f446drivers.list"
+arm-none-eabi-objcopy  -O binary  stm32f446drivers.elf  "stm32f446drivers.bin"
+   text	   data	    bss	    dec	    hex	filename
+   2848	      8	   1056	   3912	    f48	stm32f446drivers.elf
+Finished building: default.size.stdout
+ 
+Finished building: stm32f446drivers.bin
+Finished building: stm32f446drivers.list
+ 
+ 
+
+10:53:51 Build Finished. 0 errors, 0 warnings. (took 588ms)
+

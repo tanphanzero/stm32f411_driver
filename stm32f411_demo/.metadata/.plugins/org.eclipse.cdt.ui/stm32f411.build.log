@@ -1,0 +1,17 @@
+22:53:05 **** Incremental Build of configuration Debug for project stm32f411 ****
+make -j8 all 
+arm-none-eabi-gcc "../Driver/Src/stm32f411disc_uart_driver.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32F411VETx -DSTM32 -DSTM32F4 -c -I../Inc -I"D:/stm32/stm32f411_demo/stm32f411/Driver/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Driver/Src/stm32f411disc_uart_driver.d" -MT"Driver/Src/stm32f411disc_uart_driver.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Driver/Src/stm32f411disc_uart_driver.o"
+arm-none-eabi-gcc -o "stm32f411.elf" @"objects.list"   -mcpu=cortex-m4 -T"D:\stm32\stm32f411_demo\stm32f411\STM32F411VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f411.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: stm32f411.elf
+ 
+arm-none-eabi-size   stm32f411.elf 
+arm-none-eabi-objdump -h -S  stm32f411.elf  > "stm32f411.list"
+   text	   data	    bss	    dec	    hex	filename
+   2716	      8	   1568	   4292	   10c4	stm32f411.elf
+Finished building: default.size.stdout
+ 
+Finished building: stm32f411.list
+ 
+
+22:53:06 Build Finished. 0 errors, 0 warnings. (took 640ms)
+

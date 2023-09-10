@@ -1,0 +1,10 @@
+11:18:40 **** Incremental Build of configuration Debug for project stm32f4 spi driver ****
+make -j8 all 
+arm-none-eabi-size   stm32f4\ spi\ driver.elf 
+   text	   data	    bss	    dec	    hex	filename
+   2952	      8	   1568	   4528	   11b0	stm32f4 spi driver.elf
+Finished building: default.size.stdout
+ 
+
+11:18:41 Build Finished. 0 errors, 0 warnings. (took 931ms)
+

@@ -1,0 +1,30 @@
+/*
+ * stm32f411disc_uart_driver.c
+ *
+ *  Created on: Sep 9, 2023
+ *      Author: Dell
+ */
+
+
+void USART_PeriClockControl(USART_RegDef_t *pUSARTx, uint8_t EnorDi)
+{
+    if (EnorDi == ENABLE)
+    {
+        if (pUSARTx == USART1)
+            USART1_PCLK_EN();
+        else if (pUSARTx == USART2)
+            USART2_PCLK_EN();
+        else if (pUSARTx == USART6)
+            USART6_PCLK_EN();
+    }
+    else
+    {
+        if (pUSARTx == USART1)
+            USART1_PCLK_DI();
+        else if (pUSARTx == USART2)
+            USART2_PCLK_DI();
+        else if (pUSARTx == USART6)
+            USART6_PCLK_DI();
+    }
+}
+

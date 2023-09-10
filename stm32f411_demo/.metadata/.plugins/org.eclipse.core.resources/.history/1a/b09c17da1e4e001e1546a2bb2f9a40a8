@@ -1,0 +1,96 @@
+/*
+ * 004.SPI_Send.c
+ *
+ *  Created on: Sep 7, 2023
+ *      Author: Dell
+ */
+
+#include "stm32f411_gpio_driver.h"
+#include "stm32f411_spi_driver.h"
+#include "stm32f411.h"
+#include <string.h>
+
+/*
+	PB12 --> SPI2_NSS
+	PB13 --> SPI2_SCLK
+	PB14 --> SPI2_MISO
+	PB15 --> SPI2_MOSI
+	ALT function mode: 5
+*/
+uint8_t u8_SPI2_TxBuff[20] = "hello";
+void SPI2_GPIOInits()
+{
+	GPIO_Handle_t SPIPins;
+
+	SPIPins.pGPIOx = GPIOB;
+	SPIPins.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
+	SPIPins.GPIO_PinConfig.GPIO_PinAltFunMode = 5;
+	SPIPins.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
+	SPIPins.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+	SPIPins.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_HIGH;
+
+	GPIO_Init(&SPIPins);
+	//SCLK
+	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_13;
+	GPIO_Init(&SPIPins);
+
+	//MOSI
+	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_15;
+	GPIO_Init(&SPIPins);
+
+	//MISO
+	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_14;
+	GPIO_Init(&SPIPins);
+
+	//NSS
+	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_12;
+	GPIO_Init(&SPIPins);
+	GPIO_PeriClockControl(GPIOB, ENABLE);
+	GPIO_Init(&SPIPins);
+}
+
+void SPI2_Inits()
+{
+	SPI_Handle_t SPI2handle;
+
+	SPI2handle.pSPIx = SPI2;
+	SPI2handle.SPI_Config.SPI_BusConfig = SPI_BUS_CONFIG_FD;
+	SPI2handle.SPI_Config.SPI_DeviceMode = SPI_DEVICE_MODE_MASTER;
+	SPI2handle.SPI_Config.SPI_SclkSpeed = SPI_SCLK_SPEED_DIV2;//generates sclk of 8MHz
+	SPI2handle.SPI_Config.SPI_DFF = SPI_DFF_8BITS;
+	SPI2handle.SPI_Config.SPI_CPOL = SPI_CPOL_HIGH;
+	SPI2handle.SPI_Config.SPI_CPHA = SPI_CPHA_LOW;
+	SPI2handle.SPI_Config.SPI_SSM = SPI_SSM_EN; //software slave management enabled for NSS pin
+	SPI_PeripheralClockControl(SPI2, ENABLE);
+	SPI_Init(&SPI2handle);
+
+}
+
+int main()
+{
+	char user_data[] = "Hello";
+
+	//this function is used to initialize the GPIO pins to behave as SPI2 pins
+	SPI2_GPIOInits();
+
+	//This function is used to initialize the SPI2 peripheral parameters
+	SPI2_Inits();
+
+	//SPI SSI config
+	SPI_SSIConfig(SPI2, ENABLE);
+
+	// enable the SPI peripheral
+	SPI_PeripheralControl(SPI2, ENABLE);
+
+	// send data over SPI
+	SPI_Send(SPI2, (uint8_t*)user_data, strlen(user_data));
+//	SPI_Send(SPI2, u8_SPI2_TxBuff, 20);
+	while(SPI_GetFlagStatus(SPI2, SPI_BSY_FLAG));
+
+	//close the communication by disabling the peripherals
+	SPI_PeripheralControl(SPI2, DISABLE);
+
+	while(1);
+
+	return 0;
+}

@@ -1,0 +1,44 @@
+/*
+ * stm32f411_i2c_driver.h
+ *
+ *  Created on: Sep 9, 2023
+ *      Author: Dell
+ */
+
+#ifndef INC_STM32F411_I2C_DRIVER_H_
+#define INC_STM32F411_I2C_DRIVER_H_
+
+#include "stm32f411.h"
+
+typedef struct
+{
+	uint32_t I2C_SCLSpeed;
+	uint8_t I2C_DeviceAddress;
+	uint8_t I2C_ACKControl;
+	uint16_t I2C_FMDutyCycle;
+}I2C_Config_t;
+
+typedef struct {
+	I2C_RegDef_t *pI2Cx;
+	I2C_Config_t I2C_Config;
+
+	uint8_t RxTxStatus;				// Possible values from Status
+	uint8_t *pRxBuffer;
+	uint8_t *pTxBuffer;
+	uint32_t TxLen;
+	uint32_t RxLen;						// Current length of the remaining message
+	uint8_t Target_Address;				// Address of the slave that this master is communicating with
+	uint8_t RepeatedStart;				// Possible values from Repeated_Start
+	uint32_t RxSize;
+} I2C_Handle_t;
+
+
+
+
+
+
+
+
+
+
+#endif /* INC_STM32F411_I2C_DRIVER_H_ */

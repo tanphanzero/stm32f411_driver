@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item key="selection" value="I2C_ExecuteAddresPhase"/>
+		<item key="wrap" value="true"/>
+		<item key="casesensitive" value="false"/>
+		<item key="wholeword" value="false"/>
+		<item key="incremental" value="false"/>
+		<item key="isRegEx" value="false"/>
+		<list key="findhistory">
+			<item value="I2C_executeAddresPhase"/>
+			<item value="I2C_Close_recieve"/>
+			<item value="I2C_BUSY_IN_TX"/>
+			<item value="TxRxState"/>
+			<item value="RxTxStatus"/>
+			<item value="USART_PeripheralControl"/>
+			<item value="SPI4_PCLK_DI"/>
+			<item value="AHB1RSTR"/>
+			<item value="GPIO_PIN_SET"/>
+			<item value="PinNumber"/>
+		</list>
+		<list key="replacehistory">
+			<item value="I2C_ExecuteAddresPhase"/>
+			<item value="I2C_CloseSendData"/>
+			<item value="I2C_STATUS_BUSY_IN_TX"/>
+			<item value="RxTxStatus"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="367"/>
+		<item key="DIALOG_Y_ORIGIN" value="380"/>
+		<item key="DIALOG_WIDTH" value="414"/>
+		<item key="DIALOG_HEIGHT" value="454"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+	</section>
+</section>
